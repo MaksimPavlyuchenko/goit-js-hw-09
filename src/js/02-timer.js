@@ -3,12 +3,13 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { Confirm } from 'notiflix/build/notiflix-confirm-aio';
 
 const start = document.querySelector('button[data-start]');
-const daysValue = document.querySelector('[data-days]');
-const hoursValue = document.querySelector('[data-hours]');
-const minutesValue = document.querySelector('[data-minutes]');
-const secondsValue = document.querySelector('[data-seconds]');
-const currentTime = new Date();
+const days = document.querySelector('[data-days]');
+const hours = document.querySelector('[data-hours]');
+const minutes = document.querySelector('[data-minutes]');
+const seconds = document.querySelector('[data-seconds]');
+
 let selectedDate = null;
+
 let timerId = null;
 
 const options = {
@@ -36,15 +37,20 @@ flatpickr('#datetime-picker', options);
 
 start.setAttribute('disabled', 'true');
 start.addEventListener('click', onStart);
+
 function onStart() {
   start.setAttribute('disabled', 'true');
-  if (selectedDate > Date.now) {
+  if (selectedDate > Date.now()) {
     timerId = setInterval(() => {
-      console.log(convertMs(selectedDate - Date.now()));
+      const msCount = convertMs(selectedDate - Date.now());
+      seconds.textContent = addLeadingZero(msCount.seconds.toString());
+      minutes.textContent = addLeadingZero(msCount.minutes.toString());
+      hours.textContent = addLeadingZero(msCount.hours.toString());
+      days.textContent = addLeadingZero(msCount.days.toString());
+      if (selectedDate - Date.now() < 1000) {
+        clearInterval(timerId);
+      }
     }, 1000);
-  } else if (selectedDate === Date.now()) {
-    clearInterval(timerId);
-    start.removeAttribute('disabled');
   }
 }
 
@@ -65,4 +71,6 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function addLeadingZero(value) {}
+function addLeadingZero(value) {
+  return value.padStart(2, '0');
+}
